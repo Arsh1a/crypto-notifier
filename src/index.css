@@ -1,0 +1,148 @@
+* {
+  color: #fdfeff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #1a1a33;
+  padding: 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input {
+  outline: none;
+  border: none;
+  padding: 12px;
+  border-radius: 15px;
+  background: rgb(34, 35, 67);
+  background: linear-gradient(7deg, rgba(34, 35, 67, 1) 66%, rgba(37, 40, 75, 1) 100%);
+}
+
+button {
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+
+.navbar {
+  margin-bottom: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sound {
+  cursor: pointer;
+  font-size: 34px;
+  transition: 0.3s;
+}
+
+.sound:hover {
+  opacity: 0.5;
+}
+
+.alert-at {
+  display: flex;
+  align-items: center;
+}
+
+.alert-at form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.alert-at button {
+  background-color: transparent;
+  position: absolute;
+  right: 10px;
+  transition: 0.3s;
+}
+
+.alert-at button:hover {
+  opacity: 0.5;
+}
+
+.crypto-container {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 30px;
+}
+
+.crypto {
+  padding: 20px;
+  border-radius: 10px;
+  background: rgb(34, 35, 67);
+  background: linear-gradient(7deg, rgba(34, 35, 67, 1) 66%, rgba(37, 40, 75, 1) 100%);
+}
+
+.rates {
+  display: flex;
+  margin: 10px 0;
+}
+
+.going-down {
+  color: rgb(223, 78, 78);
+}
+
+.going-up {
+  color: rgb(60, 192, 60);
+}
+
+/*MEDIA QUERIES*/
+
+@media (min-width: 600px) {
+  .crypto-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 800px) {
+  .crypto-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .crypto-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 2000px) {
+  .crypto-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
