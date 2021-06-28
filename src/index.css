@@ -49,17 +49,44 @@ input {
   background: linear-gradient(7deg, rgba(34, 35, 67, 1) 66%, rgba(37, 40, 75, 1) 100%);
 }
 
+input[type="submit"] {
+  cursor: pointer;
+}
+
 button {
   cursor: pointer;
   outline: none;
   border: none;
+  background-color: #3ea6fd;
+  border-radius: 20px;
+  width: 140px;
+  transition: 0.3s;
+  padding: 16px 0;
+}
+
+button:hover {
+  opacity: 0.5;
 }
 
 .navbar {
   margin-bottom: 60px;
   display: flex;
   align-items: center;
+  flex-direction: column;
   justify-content: space-between;
+}
+
+.left-navbar {
+  display: flex;
+  align-items: center;
+}
+
+.left-navbar button {
+  margin-left: 80px;
+}
+
+.right-navbar {
+  margin-top: 30px;
 }
 
 .sound {
@@ -84,15 +111,20 @@ button {
   margin-left: 20px;
 }
 
-.alert-at button {
+.alert-at input[type="submit"] {
   background-color: transparent;
   position: absolute;
   right: 10px;
   transition: 0.3s;
 }
 
-.alert-at button:hover {
+.alert-at input[type="submit"]:hover {
   opacity: 0.5;
+}
+
+.loading-results {
+  opacity: 0.5;
+  padding-bottom: 50px;
 }
 
 .crypto-container {
@@ -121,11 +153,36 @@ button {
   color: rgb(60, 192, 60);
 }
 
+footer {
+  padding-top: 60px;
+  display: flex;
+  justify-content: center;
+  font-size: 24px;
+}
+
+footer svg {
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+footer svg:hover {
+  opacity: 0.5;
+}
+
 /*MEDIA QUERIES*/
 
 @media (min-width: 600px) {
   .crypto-container {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 700px) {
+  .navbar {
+    flex-direction: row;
+  }
+  .right-navbar {
+    margin: 0%;
   }
 }
 

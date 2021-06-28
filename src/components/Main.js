@@ -1,29 +1,30 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useApiRequest } from "../util/useApiRequest";
 import notificationSfx from "../sounds/notification.mp3";
-import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
+import { useApiRequest, playSound } from "../utils";
+import Navbar from "./Navbar";
+import Cryptos from "./Cryptos";
+import Footer from "./Footer";
+
+const selectedCurrencies1 =
+  "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
+const selectedCurrencies2 =
+  "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REP,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO";
 
 function Main() {
   const [exchangeRates, setExchangeRates] = useState([]);
   const [currencies, setCurrencies] = useState([]);
-  const selectedCurrencies = useState(
-    "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN"
-  );
-  const { data, error, isLoaded } = useApiRequest(
-    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies}&tsyms=USD`
-  );
-  const audioRef = useRef();
   const [soundActive, setSoundActive] = useState(false);
   const [exchangeResults, setExchangeResults] = useState([]);
-  const [calculateAfter, setCalculateAfter] = useState(30);
+  const [calculateAfter] = useState(15);
   const [alertAtMinimum, setAlertAtMinimum] = useState(1.05);
   const [tempAlertAtMinimum, setTempAlertAtMinimum] = useState(1.05);
-
-  const playSound = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-  };
+  const [showOnly, setShowOnly] = useState(false);
+  const [onlyDeals, setOnlyDeals] = useState([]);
+  const { data, error, isLoaded } = useApiRequest(
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`
+  );
+  const audioRef = useRef();
 
   //Init
   useEffect(() => {
@@ -43,7 +44,7 @@ function Main() {
   useEffect(() => {
     const currencyList = exchangeRates[0];
     if (currencyList && currencies.length === 0) {
-      setCurrencies(Object.keys(currencyList));
+      setCurrencies(Object.keys(currencyList).sort());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeRates]);
@@ -65,18 +66,34 @@ function Main() {
     if (exchangeResults.length > 0) {
       if (Object.values(exchangeResults[0]).some((el) => el >= alertAtMinimum)) {
         if (soundActive) {
-          playSound();
+          playSound(audioRef);
         }
       }
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeResults]);
 
+  //Show only good deals
+  useEffect(() => {
+    if (showOnly) {
+      if (exchangeResults.length > 0) {
+        const filtered = Object.entries(exchangeResults[0]).filter(
+          ([key, value]) => value >= alertAtMinimum
+        );
+        const result = Object.fromEntries(filtered);
+        const resultArray = Object.keys(result);
+        setOnlyDeals(resultArray);
+      }
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOnly, exchangeResults]);
+
   const calculateResult = (currency) => {
     if (exchangeRates.length === calculateAfter) {
       return exchangeRates[exchangeRates.length - 1][currency].USD / exchangeRates[0][currency].USD;
     }
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setAlertAtMinimum(tempAlertAtMinimum);
@@ -89,51 +106,29 @@ function Main() {
       <audio ref={audioRef}>
         <source src={notificationSfx} type="audio/mp3" />
       </audio>
-      <div className="navbar">
-        <div
-          className="sound"
-          onClick={() => {
-            setSoundActive(!soundActive);
-            !soundActive && playSound();
-          }}
-        >
-          {soundActive ? <MdVolumeUp /> : <MdVolumeOff />}
-        </div>
-        <div className="alert-at">
-          Alert at:
-          <form onSubmit={handleSubmit}>
-            <input
-              required
-              type="number"
-              value={tempAlertAtMinimum}
-              onChange={(e) => setTempAlertAtMinimum(e.target.value)}
-            />
-            <button type="submit">Apply</button>
-          </form>
-        </div>
-      </div>
-      <div className="crypto-container">
-        {currencies.map((currency, index) => (
-          <div className="crypto" key={index}>
-            <h1>{currency}</h1>
-            <div className="rates">
-              {exchangeRates[0][currency].USD}$
-              {exchangeRates.length === calculateAfter && (
-                <>→{exchangeRates[exchangeRates.length - 1][currency].USD}$</>
-              )}
-            </div>
-            {
-              <p
-                className={
-                  exchangeResults[0][currency] >= alertAtMinimum ? "going-up" : "going-down"
-                }
-              >
-                result :{calculateResult(currency)}
-              </p>
-            }
-          </div>
-        ))}
-      </div>
+      <Navbar
+        {...{
+          setSoundActive,
+          soundActive,
+          audioRef,
+          handleSubmit,
+          tempAlertAtMinimum,
+          setTempAlertAtMinimum,
+          setShowOnly,
+          showOnly,
+        }}
+      />
+      <Cryptos
+        {...{
+          exchangeRates,
+          calculateAfter,
+          exchangeResults,
+          alertAtMinimum,
+          calculateResult,
+        }}
+        data={showOnly ? onlyDeals : currencies}
+      />
+      <Footer />
     </>
   );
 }
