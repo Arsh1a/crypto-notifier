@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/crypto-notifier/static/css/main.15de69a8.chunk.css",
-    "main.js": "/crypto-notifier/static/js/main.23179803.chunk.js",
-    "main.js.map": "/crypto-notifier/static/js/main.23179803.chunk.js.map",
-    "runtime-main.js": "/crypto-notifier/static/js/runtime-main.e1472c49.js",
-    "runtime-main.js.map": "/crypto-notifier/static/js/runtime-main.e1472c49.js.map",
-    "static/js/2.e9dfba46.chunk.js": "/crypto-notifier/static/js/2.e9dfba46.chunk.js",
-    "static/js/2.e9dfba46.chunk.js.map": "/crypto-notifier/static/js/2.e9dfba46.chunk.js.map",
-    "static/js/3.190d0de8.chunk.js": "/crypto-notifier/static/js/3.190d0de8.chunk.js",
-    "static/js/3.190d0de8.chunk.js.map": "/crypto-notifier/static/js/3.190d0de8.chunk.js.map",
+    "main.css": "/crypto-notifier/static/css/main.b7d1e504.chunk.css",
+    "main.js": "/crypto-notifier/static/js/main.f3093692.chunk.js",
+    "main.js.map": "/crypto-notifier/static/js/main.f3093692.chunk.js.map",
+    "runtime-main.js": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js",
+    "runtime-main.js.map": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js.map",
+    "static/js/2.ec9ef13d.chunk.js": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js",
+    "static/js/2.ec9ef13d.chunk.js.map": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js.map",
+    "static/js/3.b7b95b24.chunk.js": "/crypto-notifier/static/js/3.b7b95b24.chunk.js",
+    "static/js/3.b7b95b24.chunk.js.map": "/crypto-notifier/static/js/3.b7b95b24.chunk.js.map",
     "index.html": "/crypto-notifier/index.html",
-    "static/css/main.15de69a8.chunk.css.map": "/crypto-notifier/static/css/main.15de69a8.chunk.css.map",
-    "static/js/2.e9dfba46.chunk.js.LICENSE.txt": "/crypto-notifier/static/js/2.e9dfba46.chunk.js.LICENSE.txt",
+    "static/css/main.b7d1e504.chunk.css.map": "/crypto-notifier/static/css/main.b7d1e504.chunk.css.map",
+    "static/js/2.ec9ef13d.chunk.js.LICENSE.txt": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js.LICENSE.txt",
     "static/media/notification.aec03572.mp3": "/crypto-notifier/static/media/notification.aec03572.mp3"
   },
   "entrypoints": [
-    "static/js/runtime-main.e1472c49.js",
-    "static/js/2.e9dfba46.chunk.js",
-    "static/css/main.15de69a8.chunk.css",
-    "static/js/main.23179803.chunk.js"
+    "static/js/runtime-main.5bd5af3e.js",
+    "static/js/2.ec9ef13d.chunk.js",
+    "static/css/main.b7d1e504.chunk.css",
+    "static/js/main.f3093692.chunk.js"
   ]
 }
