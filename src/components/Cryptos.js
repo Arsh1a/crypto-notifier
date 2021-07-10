@@ -15,7 +15,9 @@ function Cryptos({
   return (
     <>
       {exchangeRates.length !== calculateAfter && (
-        <div className="loading-results">It takes 5 minute to calculate results...</div>
+        <div className="loading-results">
+          It takes {(20 * calculateAfter) / 60} minutes to calculate results...
+        </div>
       )}
       <div className="crypto-container">
         {data.map((currency, index) => (

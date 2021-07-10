@@ -8,14 +8,14 @@ import Footer from "./Footer";
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
 const selectedCurrencies2 =
-  "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REP,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO";
+  "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO";
 
 function Main() {
   const [exchangeRates, setExchangeRates] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [soundActive, setSoundActive] = useState(false);
   const [exchangeResults, setExchangeResults] = useState([]);
-  const [calculateAfter] = useState(15);
+  const [calculateAfter] = useState(9);
   const [alertAtMinimum, setAlertAtMinimum] = useState(1.05);
   const [tempAlertAtMinimum, setTempAlertAtMinimum] = useState(1.05);
   const [showOnly, setShowOnly] = useState(false);
@@ -25,6 +25,10 @@ function Main() {
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`
   );
   const audioRef = useRef();
+
+  useEffect(() => {
+    console.log("run");
+  }, []);
 
   //Init
   useEffect(() => {
