@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const useApiRequest = (url, secondUrl) => {
+const useApiRequest = (url, secondUrl, thirdUrl) => {
   const [data, setData] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchData = () => {
-    if (secondUrl) {
+    if (secondUrl && thirdUrl) {
       axios
-        .all([axios.get(url), axios.get(secondUrl)])
+        .all([axios.get(url), axios.get(secondUrl), axios.get(thirdUrl)])
         .then(
           axios.spread((obj1, obj2) => {
             setIsLoaded(true);
