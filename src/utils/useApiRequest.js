@@ -11,9 +11,9 @@ const useApiRequest = (url, secondUrl, thirdUrl) => {
       axios
         .all([axios.get(url), axios.get(secondUrl), axios.get(thirdUrl)])
         .then(
-          axios.spread((obj1, obj2) => {
+          axios.spread((obj1, obj2, obj3) => {
             setIsLoaded(true);
-            setData({ ...obj1.data, ...obj2.data });
+            setData({ ...obj1.data, ...obj2.data, ...obj3.data });
           })
         )
         .catch((error) => {
