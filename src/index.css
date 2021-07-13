@@ -145,6 +145,19 @@ button:hover {
   margin: 10px 0;
 }
 
+.crypto-exchange {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.crypto-exchange img {
+  transition: 0.3s;
+}
+
+.crypto-exchange img:hover {
+  opacity: 0.5;
+}
 .going-down {
   color: rgb(223, 78, 78);
 }

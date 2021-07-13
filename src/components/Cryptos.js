@@ -38,6 +38,21 @@ function Cryptos({
                 result :{calculateResult(currency)}
               </p>
             }
+            <div className="crypto-exchange">
+              <a
+                href={`https://www.binance.com/en/trade/${currency}_USDT`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  title={`Trade ${currency} in Binance`}
+                  src="/crypto-notifier/binance-icon.svg"
+                  height="30"
+                  width="30"
+                  alt="Binance"
+                />
+              </a>
+            </div>
           </div>
         ))}
       </div>
