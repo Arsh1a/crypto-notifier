@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/crypto-notifier/static/css/main.d00ec58f.chunk.css",
-    "main.js": "/crypto-notifier/static/js/main.12c6443d.chunk.js",
-    "main.js.map": "/crypto-notifier/static/js/main.12c6443d.chunk.js.map",
+    "main.js": "/crypto-notifier/static/js/main.3b7d57aa.chunk.js",
+    "main.js.map": "/crypto-notifier/static/js/main.3b7d57aa.chunk.js.map",
     "runtime-main.js": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js",
     "runtime-main.js.map": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js.map",
     "static/js/2.ec9ef13d.chunk.js": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.5bd5af3e.js",
     "static/js/2.ec9ef13d.chunk.js",
     "static/css/main.d00ec58f.chunk.css",
-    "static/js/main.12c6443d.chunk.js"
+    "static/js/main.3b7d57aa.chunk.js"
   ]
 }
