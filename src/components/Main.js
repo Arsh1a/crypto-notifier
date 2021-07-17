@@ -10,7 +10,7 @@ const selectedCurrencies1 =
 const selectedCurrencies2 =
   "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO,ATM,ASR,ACM,AUTO,AKRO";
 const selectedCurrencies3 =
-  "ALGO,BAR,BAND,BNB,BLZ,DODO,DIA,FIS,FIRO,GXS,GRT,IOTA,JUV,KEY,KNC,KLAY,LUNA,LSK,NULS,NU,NMR,NEO,OCEN,OGN,OMG,PSG,POND,PHA,PERP,PERL,PAX,RIF,RSR,SFP,SXP,SUN,STORJ,TLM,UNFI,UTK,VTHO,VET,WTC,WAN,WRX,WNXM,WIN,XVG,XRP,XLM,XEM";
+  "ALGO,BAR,BAND,BNB,BLZ,DODO,DIA,FIS,FIRO,GXS,GRT,IOTA,JUV,KEY,KNC,KLAY,LUNA,LSK,NULS,NU,NMR,NEO,OCEN,OGN,OMG,PSG,POND,PHA,PERP,PERL,PAX,RIF,RSR,SFP,SXP,SUN,STORJ,TLM,UNFI,UTK,VET,WTC,WAN,WRX,WNXM,WIN,XRP,XLM,XEM";
 
 function Main() {
   const [exchangeRates, setExchangeRates] = useState([]);
@@ -92,8 +92,7 @@ function Main() {
         setOnlyDeals(resultArray);
       }
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showOnly, exchangeResults]);
+  }, [showOnly, exchangeResults, alertAtMinimum]);
 
   const calculateResult = (currency) => {
     if (exchangeRates.length === calculateAfter) {
