@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const useApiRequest = (url, secondUrl, thirdUrl) => {
+const useApiRequest = (url: string, secondUrl: string, thirdUrl: string) => {
   const [data, setData] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);

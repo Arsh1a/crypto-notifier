@@ -2,6 +2,17 @@ import React from "react";
 import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
 import { playSound } from "../utils";
 
+interface Props {
+  setSoundActive: Function;
+  soundActive: boolean;
+  audioRef: React.MutableRefObject<HTMLAudioElement>;
+  handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  tempAlertAtMinimum: number;
+  setTempAlertAtMinimum: Function;
+  showOnly: boolean;
+  setShowOnly: Function;
+}
+
 function Navbar({
   setSoundActive,
   soundActive,
@@ -11,7 +22,7 @@ function Navbar({
   setTempAlertAtMinimum,
   setShowOnly,
   showOnly,
-}) {
+}: Props) {
   return (
     <div className="navbar">
       <div className="left-navbar">

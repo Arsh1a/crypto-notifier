@@ -1,4 +1,4 @@
-const playSound = (audioRef) => {
+const playSound = (audioRef: React.MutableRefObject<HTMLAudioElement>) => {
   if (audioRef.current) {
     audioRef.current.play();
   }

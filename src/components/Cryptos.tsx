@@ -1,16 +1,22 @@
 import React from "react";
 
+interface Props {
+  exchangeRates: any[];
+  calculateAfter: number;
+  exchangeResults: string[];
+  alertAtMinimum: number;
+  calculateResult: Function;
+  data: string[];
+}
+
 function Cryptos({
-  currencies,
   exchangeRates,
   calculateAfter,
   exchangeResults,
   alertAtMinimum,
   calculateResult,
-  onlyDeals,
-  showOnly,
   data,
-}) {
+}: Props) {
   if (data.length === 0) return <h1>Empty</h1>;
   return (
     <>
@@ -20,7 +26,7 @@ function Cryptos({
         </div>
       )}
       <div className="crypto-container">
-        {data.map((currency, index) => (
+        {data.map((currency: any, index) => (
           <div className="crypto" key={index}>
             <h1>{currency}</h1>
             <div className="rates">
@@ -32,7 +38,7 @@ function Cryptos({
             {
               <p
                 className={
-                  exchangeResults[0][currency] >= alertAtMinimum ? "going-up" : "going-down"
+                  Number(exchangeResults[0][currency]) >= alertAtMinimum ? "going-up" : "going-down"
                 }
               >
                 result :{calculateResult(currency)}
