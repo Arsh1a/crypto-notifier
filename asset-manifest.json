@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/crypto-notifier/static/css/main.27a14741.chunk.css",
-    "main.js": "/crypto-notifier/static/js/main.0bf37491.chunk.js",
-    "main.js.map": "/crypto-notifier/static/js/main.0bf37491.chunk.js.map",
+    "main.css": "/crypto-notifier/static/css/main.70e23e72.chunk.css",
+    "main.js": "/crypto-notifier/static/js/main.440b7ffe.chunk.js",
+    "main.js.map": "/crypto-notifier/static/js/main.440b7ffe.chunk.js.map",
     "runtime-main.js": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js",
     "runtime-main.js.map": "/crypto-notifier/static/js/runtime-main.5bd5af3e.js.map",
     "static/js/2.ec9ef13d.chunk.js": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js",
@@ -10,14 +10,14 @@
     "static/js/3.b7b95b24.chunk.js": "/crypto-notifier/static/js/3.b7b95b24.chunk.js",
     "static/js/3.b7b95b24.chunk.js.map": "/crypto-notifier/static/js/3.b7b95b24.chunk.js.map",
     "index.html": "/crypto-notifier/index.html",
-    "static/css/main.27a14741.chunk.css.map": "/crypto-notifier/static/css/main.27a14741.chunk.css.map",
+    "static/css/main.70e23e72.chunk.css.map": "/crypto-notifier/static/css/main.70e23e72.chunk.css.map",
     "static/js/2.ec9ef13d.chunk.js.LICENSE.txt": "/crypto-notifier/static/js/2.ec9ef13d.chunk.js.LICENSE.txt",
     "static/media/notification.aec03572.mp3": "/crypto-notifier/static/media/notification.aec03572.mp3"
   },
   "entrypoints": [
     "static/js/runtime-main.5bd5af3e.js",
     "static/js/2.ec9ef13d.chunk.js",
-    "static/css/main.27a14741.chunk.css",
-    "static/js/main.0bf37491.chunk.js"
+    "static/css/main.70e23e72.chunk.css",
+    "static/js/main.440b7ffe.chunk.js"
   ]
 }
