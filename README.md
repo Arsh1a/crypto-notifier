@@ -1,3 +1,4 @@
+![screenshot](https://user-images.githubusercontent.com/42667460/132098481-fd8e8bb3-7b96-4d42-b6c0-e672c3ec9bef.PNG)
 # Crypto-notifier
 
 Notify the user when a cryptocurrency price goes 🚀 by the defined amount using [Cryptocompare.com](https://www.cryptocompare.com/ "Cryptocompare website") API.
