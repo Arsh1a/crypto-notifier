@@ -102,7 +102,7 @@ function Main() {
   };
 
   if (error) return <div>Failed to load</div>;
-  if (!isLoaded) return <div className="loading">Loading...</div>;
+  if (!isLoaded) return <div className="loading">Loading</div>;
   return (
     <>
       <audio ref={audioRef}>
