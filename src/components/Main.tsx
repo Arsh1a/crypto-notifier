@@ -81,7 +81,7 @@ function Main() {
     if (showOnly) {
       if (exchangeResults.length > 0) {
         const filtered = Object.entries(exchangeResults[0]).filter(
-          (value: any) => value >= alertAtMinimum
+          ([key, value]: any) => value >= alertAtMinimum
         );
         const result = Object.fromEntries(filtered);
         const resultArray = Object.keys(result);
