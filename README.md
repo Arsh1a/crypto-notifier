@@ -11,8 +11,8 @@ Notify the user when a cryptocurrency price goes 🚀 by the defined amount usin
 
 ## How It Works
 
-1. Every 20 seconds, we get the current cryptocurrency prices up to 9 times and store them.
-2. Then, we compare the first and last price.
+1. Every 20 seconds, we fetch the current cryptocurrency prices up to 9 times and store them.
+2. Then, we compare the first and last price of the fetched cryptocurrency.
 3. We keep comparing them every 20 seconds until the cryptocurrency price rises by the defined amount.
 4. Then, we notify the user with a notification sound (if turned on).
 
