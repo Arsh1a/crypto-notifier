@@ -39,6 +39,7 @@ function Main() {
         setExchangeRates((oldArray) => [...oldArray, data]);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   //Init currencies
@@ -47,6 +48,7 @@ function Main() {
     if (currencyList && currencies.length === 0) {
       setCurrencies(Object.keys(currencyList).sort());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeRates]);
 
   //Init exchange results
@@ -58,6 +60,7 @@ function Main() {
       );
       setExchangeResults([initExchangeResults]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeRates]);
 
   //Checks if there is a good investment and plays sound
@@ -69,6 +72,7 @@ function Main() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeResults]);
 
   //Show only good deals

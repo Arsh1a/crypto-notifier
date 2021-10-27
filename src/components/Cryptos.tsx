@@ -17,19 +17,14 @@ function Cryptos({
   calculateResult,
   data,
 }: Props) {
-  if (exchangeRates.length !== calculateAfter)
-    return (
-      <>
-        {exchangeRates.length !== calculateAfter && (
-          <div className="loading loading-results">
-            It takes {(20 * calculateAfter) / 60} minutes to calculate results
-          </div>
-        )}
-      </>
-    );
   if (data.length === 0) return <h1>Empty</h1>;
   return (
     <>
+      {exchangeRates.length !== calculateAfter && (
+        <div className="loading loading-results">
+          It takes {(20 * calculateAfter) / 60} minutes to calculate results
+        </div>
+      )}
       <div className="crypto-container">
         {data.map((currency: any, index) => (
           <div className="crypto" key={index}>
