@@ -9,8 +9,10 @@ interface Props {
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
   tempAlertAtMinimum: number;
   setTempAlertAtMinimum: Function;
-  showOnly: boolean;
-  setShowOnly: Function;
+  showDeals: boolean;
+  setShowDeals: Function;
+  showFavorites: boolean;
+  setShowFavorites: Function;
 }
 
 function Navbar({
@@ -20,8 +22,10 @@ function Navbar({
   handleSubmit,
   tempAlertAtMinimum,
   setTempAlertAtMinimum,
-  setShowOnly,
-  showOnly,
+  setShowDeals,
+  showDeals,
+  setShowFavorites,
+  showFavorites,
 }: Props) {
   return (
     <div className="navbar">
@@ -35,8 +39,11 @@ function Navbar({
         >
           {soundActive ? <MdVolumeUp /> : <MdVolumeOff />}
         </div>
-        <button onClick={() => setShowOnly(!showOnly)}>
-          {showOnly ? <>Show all</> : <>Show only green</>}
+        <button onClick={() => setShowDeals(!showDeals)}>
+          {showDeals ? <>Show all</> : <>Show only green</>}
+        </button>
+        <button onClick={() => setShowFavorites(!showFavorites)}>
+          {showFavorites ? <>Show all</> : <>Show only Favorites</>}
         </button>
       </div>
       <div className="right-navbar">

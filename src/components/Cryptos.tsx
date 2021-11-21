@@ -1,23 +1,48 @@
 import React from "react";
+import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 
 interface Props {
+  currencies: string[];
   exchangeRates: any[];
   calculateAfter: number;
   exchangeResults: string[];
   alertAtMinimum: number;
   calculateResult: Function;
   data: string[];
+  setFavorites: Function;
+  favorites: string[];
 }
 
 function Cryptos({
+  currencies,
   exchangeRates,
   calculateAfter,
   exchangeResults,
   alertAtMinimum,
   calculateResult,
   data,
+  setFavorites,
+  favorites,
 }: Props) {
+  const handleFavorites = (currency: string) => {
+    if (favorites.includes(currency)) {
+      removeFromFavorites(currency);
+    }
+    if (!favorites.includes(currency)) {
+      addToFavorites(currency);
+    }
+  };
+
+  const addToFavorites = (currency: string) => {
+    setFavorites([...favorites, currency]);
+  };
+
+  const removeFromFavorites = (currency: string) => {
+    setFavorites(favorites.filter((item) => item !== currency));
+  };
+
   if (data.length === 0) return <h1>Empty</h1>;
+
   return (
     <>
       {exchangeRates.length !== calculateAfter && (
@@ -30,7 +55,7 @@ function Cryptos({
           <div className="crypto" key={index}>
             <h1>{currency}</h1>
             <div className="rates">
-              {exchangeRates[0][currency].USD}$
+              {exchangeRates ? exchangeRates[0][currency].USD : "TEST"}$
               {exchangeRates.length === calculateAfter && (
                 <>→{exchangeRates[exchangeRates.length - 1][currency].USD}$</>
               )}
@@ -53,11 +78,18 @@ function Cryptos({
                 <img
                   title={`Trade ${currency} in Binance`}
                   src="/crypto-notifier/binance-icon.svg"
-                  height="30"
-                  width="30"
+                  height="25"
+                  width="25"
                   alt="Binance"
                 />
               </a>
+              <span
+                className="crypto-favorite"
+                title="Favorite"
+                onClick={() => handleFavorites(currency)}
+              >
+                {favorites.includes(currency) ? <IoMdHeart /> : <IoMdHeartEmpty />}
+              </span>
             </div>
           </div>
         ))}

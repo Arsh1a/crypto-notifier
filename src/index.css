@@ -60,9 +60,8 @@ button {
   border: none;
   background-color: #3ea6fd;
   border-radius: 20px;
-  width: 140px;
   transition: 0.3s;
-  padding: 16px 0;
+  padding: 16px 16px;
 }
 
 button:hover {
@@ -151,6 +150,8 @@ button:hover {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
+  gap: 20px;
+  align-items: center;
 }
 
 .crypto-exchange img {
@@ -159,6 +160,20 @@ button:hover {
 
 .crypto-exchange img:hover {
   opacity: 0.5;
+}
+
+.crypto-favorite {
+  font-size: 32px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.crypto-favorite:hover {
+  opacity: 0.5;
+}
+
+.crypto-favorite path {
+  color: rgb(238, 62, 62) !important;
 }
 .going-down {
   color: rgb(223, 78, 78);
@@ -220,7 +235,7 @@ footer svg:hover {
   }
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .navbar {
     flex-direction: row;
   }

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef, FormEvent } from "react";
 import notificationSfx from "../sounds/notification.mp3";
 import { useApiRequest, playSound } from "../utils";
@@ -20,8 +21,10 @@ function Main() {
   const [calculateAfter] = useState<number>(9);
   const [alertAtMinimum, setAlertAtMinimum] = useState<number>(1.05);
   const [tempAlertAtMinimum, setTempAlertAtMinimum] = useState<number>(1.05);
-  const [showOnly, setShowOnly] = useState<boolean>(false);
+  const [showDeals, setShowDeals] = useState<boolean>(false);
   const [onlyDeals, setOnlyDeals] = useState<string[]>([]);
+  const [showFavorites, setShowFavorites] = useState<boolean>(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const { data, error, isLoaded } = useApiRequest(
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`,
@@ -39,7 +42,6 @@ function Main() {
         setExchangeRates((oldArray) => [...oldArray, data]);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   //Init currencies
@@ -48,7 +50,6 @@ function Main() {
     if (currencyList && currencies.length === 0) {
       setCurrencies(Object.keys(currencyList).sort());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeRates]);
 
   //Init exchange results
@@ -60,7 +61,6 @@ function Main() {
       );
       setExchangeResults([initExchangeResults]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeRates]);
 
   //Checks if there is a good investment and plays sound
@@ -72,22 +72,46 @@ function Main() {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exchangeResults]);
 
   //Show only good deals
   useEffect(() => {
-    if (showOnly) {
+    if (showDeals) {
       if (exchangeResults.length > 0) {
-        const filtered = Object.entries(exchangeResults[0]).filter(
-          ([key, value]: any) => value >= alertAtMinimum
-        );
-        const result = Object.fromEntries(filtered);
-        const resultArray = Object.keys(result);
-        setOnlyDeals(resultArray);
+        if (showFavorites) {
+          //Show good deals for favorites
+          const filtered = Object.entries(exchangeResults[0]).filter(
+            ([key, value]: any) => value >= alertAtMinimum
+          );
+          const result = Object.fromEntries(filtered);
+          const resultArray = Object.keys(result);
+          setOnlyDeals(resultArray.filter((item) => favorites.includes(item)));
+        }
+        //Show good deals for all currencies
+        else {
+          const filtered = Object.entries(exchangeResults[0]).filter(
+            ([key, value]: any) => value >= alertAtMinimum
+          );
+          const result = Object.fromEntries(filtered);
+          const resultArray = Object.keys(result);
+          setOnlyDeals(resultArray);
+        }
       }
     }
-  }, [showOnly, exchangeResults, alertAtMinimum]);
+  }, [showDeals, showFavorites, exchangeResults, alertAtMinimum]);
+
+  //Get favorites from localstorage
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem("favorites");
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+  }, []);
+
+  //Set favorites to localstorage
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   const calculateResult = (currency: string) => {
     if (exchangeRates.length === calculateAfter) {
@@ -98,6 +122,22 @@ function Main() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setAlertAtMinimum(tempAlertAtMinimum);
+  };
+
+  const handleAppState = () => {
+    if (!showDeals && !showFavorites) {
+      return currencies;
+    }
+    if (showDeals && showFavorites) {
+      return onlyDeals;
+    }
+    if (!showDeals && showFavorites) {
+      return favorites;
+    }
+    if (showDeals && !showFavorites) {
+      return onlyDeals;
+    }
+    return currencies;
   };
 
   if (error) return <div>Failed to load</div>;
@@ -115,19 +155,24 @@ function Main() {
           handleSubmit,
           tempAlertAtMinimum,
           setTempAlertAtMinimum,
-          setShowOnly,
-          showOnly,
+          setShowDeals,
+          showDeals,
+          setShowFavorites,
+          showFavorites,
         }}
       />
       <Cryptos
         {...{
+          currencies,
           exchangeRates,
           calculateAfter,
           exchangeResults,
           alertAtMinimum,
           calculateResult,
+          favorites,
+          setFavorites,
         }}
-        data={showOnly ? onlyDeals : currencies}
+        data={handleAppState()}
       />
       <Footer />
     </>
