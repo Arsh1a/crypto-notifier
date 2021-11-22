@@ -66,9 +66,23 @@ function Main() {
   //Checks if there is a good investment and plays sound
   useEffect(() => {
     if (exchangeResults.length > 0) {
-      if (Object.values(exchangeResults[0]).some((el: any) => el >= alertAtMinimum)) {
-        if (soundActive) {
-          playSound(audioRef);
+      //Plays sound if one of favorites goes beyond alertAtMinimum
+      if (showFavorites) {
+        const filtered = Object.entries(exchangeResults[0]).filter(
+          ([key, value]: any) => value >= alertAtMinimum
+        );
+        const result = Object.fromEntries(filtered);
+        if (Object.keys(result).some((el: any) => favorites.includes(el))) {
+          if (soundActive) {
+            playSound(audioRef);
+          }
+        }
+        //Plays sound if showFavorite not active and all currencies goes beyond alertAtMinimum
+      } else {
+        if (Object.values(exchangeResults[0]).some((el: any) => el >= alertAtMinimum)) {
+          if (soundActive) {
+            playSound(audioRef);
+          }
         }
       }
     }
