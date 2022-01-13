@@ -18,7 +18,7 @@ function Main() {
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [soundActive, setSoundActive] = useState<boolean>(false);
   const [exchangeResults, setExchangeResults] = useState<any[]>([]);
-  const [calculateAfter] = useState<number>(4.5);
+  const [calculateAfter] = useState<number>(5);
   const [alertAtMinimum, setAlertAtMinimum] = useState<number>(1.05);
   const [tempAlertAtMinimum, setTempAlertAtMinimum] = useState<number>(1.05);
   const [showDeals, setShowDeals] = useState<boolean>(false);
