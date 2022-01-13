@@ -47,7 +47,7 @@ function Cryptos({
     <>
       {exchangeRates.length !== calculateAfter && (
         <div className="loading loading-results">
-          It takes {(20 * calculateAfter) / 60} minutes to calculate results
+          It takes {Math.ceil((20 * calculateAfter) / 60)} minutes to calculate results
         </div>
       )}
       <div className="crypto-container">
