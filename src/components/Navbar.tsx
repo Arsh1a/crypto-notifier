@@ -40,10 +40,10 @@ function Navbar({
           {soundActive ? <MdVolumeUp /> : <MdVolumeOff />}
         </div>
         <button onClick={() => setShowDeals(!showDeals)}>
-          {showDeals ? <>Show all</> : <>Show only green</>}
+          {showDeals ? <>Show all</> : <>Show only greens</>}
         </button>
         <button onClick={() => setShowFavorites(!showFavorites)}>
-          {showFavorites ? <>Show all</> : <>Show only Favorites</>}
+          {showFavorites ? <>Show all</> : <>Show only favorites</>}
         </button>
       </div>
       <div className="right-navbar">

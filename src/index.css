@@ -9,7 +9,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1a1a33;
-  padding: 60px;
+  padding: 40px 20px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -71,7 +71,6 @@ button:hover {
 .navbar {
   margin-bottom: 60px;
   display: flex;
-  align-items: center;
   flex-direction: column;
   justify-content: space-between;
 }
@@ -79,10 +78,8 @@ button:hover {
 .left-navbar {
   display: flex;
   align-items: center;
-}
-
-.left-navbar button {
-  margin-left: 80px;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .right-navbar {
@@ -228,6 +225,12 @@ footer svg:hover {
 }
 
 /*MEDIA QUERIES*/
+
+@media (min-width: 950px) {
+  body {
+    padding: 50px;
+  }
+}
 
 @media (min-width: 600px) {
   .crypto-container {
