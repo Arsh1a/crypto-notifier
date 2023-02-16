@@ -41,6 +41,20 @@ function Cryptos({
     setFavorites(favorites.filter((item) => item !== currency));
   };
 
+  const calculateCardColor = (currency: string) => {
+    let calculatedCurrency = calculateResult(currency);
+
+    if (calculatedCurrency > 1 && calculatedCurrency <= 1.002) {
+      return "linear-gradient(90deg, rgba(205,171,0,1) 0%, rgba(231,209,66,1) 100%)";
+    }
+    if (calculatedCurrency >= 1.002 && calculatedCurrency <= 1.004) {
+      return "linear-gradient(90deg, rgba(0,7,126,1) 0%, rgba(30,36,156,1) 100%)";
+    }
+    if (calculatedCurrency >= 1.004) {
+      return "linear-gradient(90deg, rgba(116,15,15,1) 0%, rgba(183,25,25,1) 100%)";
+    }
+  };
+
   if (data.length === 0) return <h1>Empty</h1>;
 
   return (
@@ -52,7 +66,7 @@ function Cryptos({
       )}
       <div className="crypto-container">
         {data.map((currency: any, index) => (
-          <div className="crypto" key={index}>
+          <div className="crypto" style={{ background: calculateCardColor(currency) }} key={index}>
             <h1>{currency}</h1>
             <div className="rates">
               {exchangeRates ? exchangeRates[0][currency].USD : "TEST"}$
@@ -62,9 +76,9 @@ function Cryptos({
             </div>
             {
               <p
-                className={
-                  Number(exchangeResults[0][currency]) >= alertAtMinimum ? "going-up" : "going-down"
-                }
+              // className={
+              //   Number(exchangeResults[0][currency]) >= alertAtMinimum ? "going-up" : "going-down"
+              // }
               >
                 result :{calculateResult(currency)}
               </p>
