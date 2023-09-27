@@ -1,58 +1,58 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const useApiRequest = (
-  url: string,
-  secondUrl: string,
-  thirdUrl: string,
-  forthUrl: string
-) => {
-  const [data, setData] = useState([]);
+const useApiRequest = (...urls: string[]) => {
+  const [data, setData] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchData = () => {
-    if (secondUrl && thirdUrl && forthUrl) {
+    // If there are multiple URLs
+    if (urls.length > 1) {
+      const requests = urls.map((url) => axios.get(url));
+
       axios
-        .all([
-          axios.get(url),
-          axios.get(secondUrl),
-          axios.get(thirdUrl),
-          axios.get(forthUrl),
-        ])
+        .all(requests)
         .then(
-          axios.spread((obj1, obj2, obj3) => {
+          axios.spread((...responses) => {
             setIsLoaded(true);
-            setData({ ...obj1.data, ...obj2.data, ...obj3.data });
+            const combinedData = Object.assign(
+              {},
+              ...responses.map((response) => response.data)
+            );
+            console.log(combinedData);
+            setData(combinedData);
           })
         )
-        .catch((error) => {
-          setError(error);
+        .catch((err) => {
+          setError(err);
         });
-    } else {
+    } else if (urls.length === 1) {
+      // If there's just one URL
       axios
-        .get(url)
+        .get(urls[0])
         .then((response) => {
           setIsLoaded(true);
-          setData(response.data);
+          setData([response.data]);
         })
-        .catch((error) => {
-          setError(error);
+        .catch((err) => {
+          setError(err);
         });
     }
   };
 
   useEffect(() => {
-    //Init fetching
+    // Init fetching
     fetchData();
-    //Fetching every described second
+    // Fetching every described second
     const interval = setInterval(() => {
       fetchData();
     }, 20000);
+
     return () => clearInterval(interval);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, secondUrl]);
+  }, urls);
 
   return { error, isLoaded, data };
 };
