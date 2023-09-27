@@ -9,10 +9,11 @@ import Footer from "./Footer";
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
 const selectedCurrencies2 =
-  "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO,ATM,AUTO,AKRO";
+  "ATA,ALPHA,ALICE,ARPA,AVE,AVA,ARDR,ANRR,BAL,BZRX,BEL,BADGER,BTT,BEAN,BCH,COMP,CRV,COS,CAKE,DEGO,DGB,DOT,ETH,EOS,ETC,FTT,HIVE,INJ,JST,KSM,LRC,LINK,NBS,LIT,MFT,MKR,MDT,ONT,ORN,PERF,PNT,RUNE,REEF,REN,ROSE,SC,STMX,SKL,SAND,SNX,STX,SRM,TRB,TROY,TRU,TORN,THETA,TCT,POLS,TRX,TKO,UNO,ATM,AUTO,AKRO,ARB";
 const selectedCurrencies3 =
-  "ALGO,BAR,BAND,BNB,BLZ,DODO,DIA,FIS,FIRO,GXS,GRT,IOTA,JUV,KEY,KNC,KLAY,LUNA,LSK,NULS,NU,NEO,OCEN,OGN,OMG,PSG,POND,PHA,PERP,PERL,PAX,RIF,RSR,SFP,SXP,SUN,STORJ,TLM,UNFI,UTK,VET,WTC,WAN,WRX,WNXM,WIN,XRP,XLM,XEM,LTC,DAI,AAVE,ADA,FTM,MATIC,AXS,MANA,AVAX,GMT,BAT,GRAPH";
-
+  "ALGO,BAR,BAND,BNB,BLZ,DODO,DIA,FIS,FIRO,GXS,GRT,IOTA,JUV,KEY,KNC,KLAY,LUNA,LSK,NULS,NU,NEO,OCEN,OGN,OMG,PSG,POND,PHA,PERP,PERL,PAX,RIF,RSR,SFP,SXP,SUN,STORJ,TLM,UNFI,UTK,VET,WTC,WAN,WRX,WNXM,WIN,XRP,XLM,XEM,LTC,DAI,AAVE,ADA,FTM,MATIC,AXS,MANA,AVAX,GMT,BAT,GRAPH,APT,ENS,SSV,SNT,ENJ,API3,APE";
+const selectedCurrencies4 =
+  "IMX,BLUR,TON,GMX,CHZ,DAO,DYDX,RDNT,WBTC,CELR,CVC,FIL,FLOW,CVX,QNT,EGALA,GLM,LPT,LDO,MAGIC,NMR,NEAR,1INCH";
 function Main() {
   const [exchangeRates, setExchangeRates] = useState<any[]>([]);
   const [currencies, setCurrencies] = useState<string[]>([]);
@@ -28,7 +29,8 @@ function Main() {
   const { data, error, isLoaded } = useApiRequest(
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`,
-    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies3}&tsyms=USD`
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies3}&tsyms=USD`,
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies4}&tsyms=USD`
   );
   const audioRef = useRef() as React.MutableRefObject<HTMLAudioElement>;
 
@@ -79,7 +81,11 @@ function Main() {
         }
         //Plays sound if showFavorite not active and all currencies goes beyond alertAtMinimum
       } else {
-        if (Object.values(exchangeResults[0]).some((el: any) => el >= alertAtMinimum)) {
+        if (
+          Object.values(exchangeResults[0]).some(
+            (el: any) => el >= alertAtMinimum
+          )
+        ) {
           if (soundActive) {
             playSound(audioRef);
           }
@@ -129,7 +135,10 @@ function Main() {
 
   const calculateResult = (currency: string) => {
     if (exchangeRates.length === calculateAfter) {
-      return exchangeRates[exchangeRates.length - 1][currency].USD / exchangeRates[0][currency].USD;
+      return (
+        exchangeRates[exchangeRates.length - 1][currency].USD /
+        exchangeRates[0][currency].USD
+      );
     }
   };
 
