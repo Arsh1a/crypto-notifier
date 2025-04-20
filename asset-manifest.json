@@ -1,25 +1,17 @@
 {
   "files": {
-    "main.css": "/crypto-notifier/static/css/main.aed96eb1.chunk.css",
-    "main.js": "/crypto-notifier/static/js/main.cec2950a.chunk.js",
-    "main.js.map": "/crypto-notifier/static/js/main.cec2950a.chunk.js.map",
-    "runtime-main.js": "/crypto-notifier/static/js/runtime-main.e0f6838b.js",
-    "runtime-main.js.map": "/crypto-notifier/static/js/runtime-main.e0f6838b.js.map",
-    "static/js/2.a754a1db.chunk.js": "/crypto-notifier/static/js/2.a754a1db.chunk.js",
-    "static/js/2.a754a1db.chunk.js.map": "/crypto-notifier/static/js/2.a754a1db.chunk.js.map",
-    "static/js/3.fde6181c.chunk.js": "/crypto-notifier/static/js/3.fde6181c.chunk.js",
-    "static/js/3.fde6181c.chunk.js.map": "/crypto-notifier/static/js/3.fde6181c.chunk.js.map",
-    "index.html": "/crypto-notifier/index.html",
+    "main.css": "/crypto-notifier/static/css/main.f8ac633e.css",
+    "main.js": "/crypto-notifier/static/js/main.dae57d84.js",
+    "static/js/453.b31bae6d.chunk.js": "/crypto-notifier/static/js/453.b31bae6d.chunk.js",
     "service-worker.js": "/crypto-notifier/service-worker.js",
-    "service-worker.js.map": "/crypto-notifier/service-worker.js.map",
-    "static/css/main.aed96eb1.chunk.css.map": "/crypto-notifier/static/css/main.aed96eb1.chunk.css.map",
-    "static/js/2.a754a1db.chunk.js.LICENSE.txt": "/crypto-notifier/static/js/2.a754a1db.chunk.js.LICENSE.txt",
-    "static/media/notification.aec03572.mp3": "/crypto-notifier/static/media/notification.aec03572.mp3"
+    "static/media/notification.mp3": "/crypto-notifier/static/media/notification.aec035724d8e0371491d.mp3",
+    "index.html": "/crypto-notifier/index.html",
+    "main.f8ac633e.css.map": "/crypto-notifier/static/css/main.f8ac633e.css.map",
+    "main.dae57d84.js.map": "/crypto-notifier/static/js/main.dae57d84.js.map",
+    "453.b31bae6d.chunk.js.map": "/crypto-notifier/static/js/453.b31bae6d.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.e0f6838b.js",
-    "static/js/2.a754a1db.chunk.js",
-    "static/css/main.aed96eb1.chunk.css",
-    "static/js/main.cec2950a.chunk.js"
+    "static/css/main.f8ac633e.css",
+    "static/js/main.dae57d84.js"
   ]
 }
