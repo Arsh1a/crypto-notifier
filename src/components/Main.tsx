@@ -13,7 +13,9 @@ const selectedCurrencies2 =
 const selectedCurrencies3 =
   "ALGO,BAR,BAND,BNB,BLZ,DODO,DIA,FIS,FIRO,GXS,GRT,IOTA,JUV,KEY,KNC,KLAY,LUNA,LSK,NULS,NU,NEO,OCEN,OGN,OMG,PSG,POND,PHA,PERP,PERL,PAX,RIF,RSR,SFP,SXP,SUN,STORJ,TLM,UNFI,UTK,VET,WTC,WAN,WRX,WNXM,WIN,XRP,XLM,XEM,LTC,DAI,AAVE,ADA,FTM,MATIC,AXS,MANA,AVAX,GMT,BAT,GRAPH,APT,ENS,SSV,SNT,ENJ,API3,APE";
 const selectedCurrencies4 =
-  "IMX,BLUR,TON,GMX,CHZ,DAO,DYDX,RDNT,WBTC,CELR,CVC,FIL,FLOW,CVX,QNT,EGALA,GLM,LPT,LDO,MAGIC,NMR,NEAR,1INCH";
+  "IMX,BLUR,TON,GMX,CHZ,DAO,DYDX,RDNT,WBTC,CELR,CVC,FIL,FLOW,CVX,QNT,EGALA,GLM,LPT,LDO,MAGIC,NMR,NEAR,1INCH,UNI,S,POL,EGALA,FLR,PMN,T,WLD,BICO,WOO,FET,NOT,ETHFI,AGLD,AEVO,W,MEME,UMA,ZRO,DOGS,G,ONDO,CATI,HMSTR,EIGEN,PAXG,XAUT,ENA,PENDLE,X,JASMY,ANKR,CAKE,BNX,HOT,EDU,SAFE,BANANA,MAJOR,MOVE";
+const selectedCurrencies5 =
+  "STRK,METIS,TURBO,CGPT,COOKIE,DEXE,ATH,NEIRO,MORPHO,FORM,RENDER";
 function Main() {
   const [exchangeRates, setExchangeRates] = useState<any[]>([]);
   const [currencies, setCurrencies] = useState<string[]>([]);
@@ -30,7 +32,8 @@ function Main() {
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`,
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies3}&tsyms=USD`,
-    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies4}&tsyms=USD`
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies4}&tsyms=USD`,
+    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies5}&tsyms=USD`
   );
   const audioRef = useRef() as React.MutableRefObject<HTMLAudioElement>;
 
