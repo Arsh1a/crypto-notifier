@@ -37,6 +37,9 @@ function Main() {
   );
   const audioRef = useRef() as React.MutableRefObject<HTMLAudioElement>;
 
+  const [thirtyMinuteGainers, setThirtyMinuteGainers] = useState<string[]>([]);
+  const thirtyMinuteSnapshot = useRef<any | null>(null);
+
   //Init
   useEffect(() => {
     if (data.length !== 0) {
@@ -123,6 +126,35 @@ function Main() {
     }
   }, [showDeals, showFavorites, exchangeResults, alertAtMinimum]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        exchangeRates.length > 0 &&
+        exchangeRates[exchangeRates.length - 1] &&
+        thirtyMinuteSnapshot.current
+      ) {
+        const current = exchangeRates[exchangeRates.length - 1];
+        const previous = thirtyMinuteSnapshot.current;
+
+        const gainers: string[] = Object.keys(current).filter((key) => {
+          const prevValue = previous[key]?.USD;
+          const currentValue = current[key]?.USD;
+          if (!prevValue || !currentValue) return false;
+          const percentChange = ((currentValue - prevValue) / prevValue) * 100;
+          return percentChange >= 0.4;
+        });
+
+        setThirtyMinuteGainers(gainers);
+      }
+
+      if (exchangeRates.length > 0) {
+        thirtyMinuteSnapshot.current = exchangeRates[exchangeRates.length - 1];
+      }
+    }, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [exchangeRates]);
+
   //Get favorites from localstorage
   useEffect(() => {
     const savedFavorites = localStorage.getItem("favorites");
@@ -187,6 +219,21 @@ function Main() {
           showFavorites,
         }}
       />
+      <div>
+        <h3>30 Minute Gainers (↑0.4%)</h3>
+        <ul
+          style={{
+            display: "flex",
+            gap: "10px",
+            listStyle: "none",
+            padding: 0,
+          }}
+        >
+          {thirtyMinuteGainers.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+      </div>
       <Cryptos
         {...{
           currencies,
