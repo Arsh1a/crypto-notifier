@@ -5,7 +5,7 @@ import { useApiRequest, playSound } from "../utils";
 import Navbar from "./Navbar";
 import Cryptos from "./Cryptos";
 import Footer from "./Footer";
-import { useRisingCryptos } from "../useRisingCryptos";
+import { useRisingCryptos } from "../utils/useRisingCryptos";
 
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";

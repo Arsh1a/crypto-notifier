@@ -19,13 +19,13 @@ export const useRisingCryptos = (exchangeRates: any) => {
     }
   }, [exchangeRates, lastSnapshotTime]);
 
-  // Countdown timer + auto snapshot every 30 min
+  // Countdown timer + auto snapshot every 15 min
   useEffect(() => {
     if (!lastSnapshotTime) return;
 
     const interval = setInterval(() => {
       const now = Date.now();
-      const nextSnapshotAt = lastSnapshotTime + 30 * 60 * 1000;
+      const nextSnapshotAt = lastSnapshotTime + 15 * 60 * 1000;
       const diff = nextSnapshotAt - now;
 
       if (diff <= 0) {
