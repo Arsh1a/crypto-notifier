@@ -5,6 +5,7 @@ import { useApiRequest, playSound } from "../utils";
 import Navbar from "./Navbar";
 import Cryptos from "./Cryptos";
 import Footer from "./Footer";
+import { useRisingCryptos } from "../useRisingCryptos";
 
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
@@ -36,9 +37,6 @@ function Main() {
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies5}&tsyms=USD`
   );
   const audioRef = useRef() as React.MutableRefObject<HTMLAudioElement>;
-
-  const [thirtyMinuteGainers, setThirtyMinuteGainers] = useState<string[]>([]);
-  const thirtyMinuteSnapshot = useRef<any | null>(null);
 
   //Init
   useEffect(() => {
@@ -126,35 +124,6 @@ function Main() {
     }
   }, [showDeals, showFavorites, exchangeResults, alertAtMinimum]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (
-        exchangeRates.length > 0 &&
-        exchangeRates[exchangeRates.length - 1] &&
-        thirtyMinuteSnapshot.current
-      ) {
-        const current = exchangeRates[exchangeRates.length - 1];
-        const previous = thirtyMinuteSnapshot.current;
-
-        const gainers: string[] = Object.keys(current).filter((key) => {
-          const prevValue = previous[key]?.USD;
-          const currentValue = current[key]?.USD;
-          if (!prevValue || !currentValue) return false;
-          const percentChange = ((currentValue - prevValue) / prevValue) * 100;
-          return percentChange >= 0.4;
-        });
-
-        setThirtyMinuteGainers(gainers);
-      }
-
-      if (exchangeRates.length > 0) {
-        thirtyMinuteSnapshot.current = exchangeRates[exchangeRates.length - 1];
-      }
-    }, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [exchangeRates]);
-
   //Get favorites from localstorage
   useEffect(() => {
     const savedFavorites = localStorage.getItem("favorites");
@@ -198,6 +167,8 @@ function Main() {
     return currencies;
   };
 
+  const { cryptosWithRise, nextCheckIn } = useRisingCryptos(exchangeRates);
+
   if (error) return <div>Failed to load</div>;
   if (!isLoaded) return <div className="loading">Loading</div>;
   return (
@@ -220,17 +191,24 @@ function Main() {
         }}
       />
       <div>
-        <h3>30 Minute Gainers (↑0.4%)</h3>
+        {nextCheckIn !== null && (
+          <p>
+            ⏱️ Next check in: {Math.floor(nextCheckIn / 60)}m {nextCheckIn % 60}
+            s
+          </p>
+        )}
+        <h3>🚀 Cryptos up ≥0.4% in 30 mins:</h3>
         <ul
           style={{
             display: "flex",
-            gap: "10px",
             listStyle: "none",
             padding: 0,
+            gap: "15px",
+            flexWrap: "wrap",
           }}
         >
-          {thirtyMinuteGainers.map((c) => (
-            <li key={c}>{c}</li>
+          {cryptosWithRise.map((crypto) => (
+            <li key={crypto}>{crypto}</li>
           ))}
         </ul>
       </div>
