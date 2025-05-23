@@ -6,6 +6,8 @@ import Navbar from "./Navbar";
 import Cryptos from "./Cryptos";
 import Footer from "./Footer";
 
+const thresholdForCount = 1.004;
+
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
 const selectedCurrencies2 =
@@ -28,10 +30,7 @@ function Main() {
   const [onlyDeals, setOnlyDeals] = useState<string[]>([]);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [priceIncreaseCount, setPriceIncreaseCount] = useState<{
-    [key: string]: number;
-  }>({});
-  const lastRatesRef = useRef<any>(null);
+  const [counts, setCounts] = useState<{ [key: string]: number }>({});
 
   const { data, error, isLoaded } = useApiRequest(
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
@@ -129,40 +128,29 @@ function Main() {
   }, [showDeals, showFavorites, exchangeResults, alertAtMinimum]);
 
   useEffect(() => {
-    if (data.length !== 0) {
-      const newRates = data;
+    if (exchangeResults.length > 0) {
+      const currentResults = exchangeResults[0];
 
-      if (lastRatesRef.current) {
-        const latest = newRates;
-        const previous = lastRatesRef.current;
+      setCounts((prevCounts) => {
+        // Clone previous counts to update
+        const newCounts = { ...prevCounts };
 
-        const updatedCount: { [key: string]: number } = {
-          ...priceIncreaseCount,
-        };
-
-        for (const key in latest) {
-          if (previous[key] && latest[key].USD && previous[key].USD) {
-            const change =
-              (latest[key].USD - previous[key].USD) / previous[key].USD;
-            if (change >= 0.004) {
-              // 0.4%
-              updatedCount[key] = (updatedCount[key] || 0) + 1;
-            }
+        Object.entries(currentResults).forEach(([currency, value]) => {
+          const numericValue = Number(value);
+          if (!isNaN(numericValue) && numericValue >= thresholdForCount) {
+            newCounts[currency] = (newCounts[currency] || 0) + 1;
           }
-        }
+        });
 
-        setPriceIncreaseCount(updatedCount);
-      }
-
-      lastRatesRef.current = newRates;
+        return newCounts;
+      });
     }
-  }, [data]);
+  }, [exchangeResults]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPriceIncreaseCount({});
-      lastRatesRef.current = null;
-    }, 15 * 60 * 1000); // 15 minutes
+      setCounts({});
+    }, 900000); // 900000 ms = 15 minutes
 
     return () => clearInterval(interval);
   }, []);
@@ -231,26 +219,25 @@ function Main() {
           showFavorites,
         }}
       />
-      {Object.entries(priceIncreaseCount).length > 0 && (
-        <div>
-          <h2>Crypto 🚀 Count (≥ 0.4% increase)</h2>
-          <ul
-            style={{
-              display: "flex",
-              gap: "20px",
-              flexWrap: "wrap",
-              listStyle: "none",
-              padding: 0,
-            }}
-          >
-            {Object.entries(priceIncreaseCount).map(([symbol, count]) => (
-              <li key={symbol}>
-                {symbol}: <span className="font-semibold">{count}</span>
-              </li>
+      <div
+        style={{
+          marginBottom: "1rem",
+        }}
+      >
+        <h3>Crypto Counts (≥ {thresholdForCount}):</h3>
+        {Object.keys(counts).length === 0 && <p>No counts yet.</p>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          {Object.entries(counts)
+            .filter(([currency, count]) =>
+              showFavorites ? favorites.includes(currency) : true
+            )
+            .map(([currency, count]) => (
+              <div key={currency}>
+                <strong>{currency}:</strong> {count}
+              </div>
             ))}
-          </ul>
         </div>
-      )}
+      </div>
       <Cryptos
         {...{
           currencies,
