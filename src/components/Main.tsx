@@ -5,7 +5,6 @@ import { useApiRequest, playSound } from "../utils";
 import Navbar from "./Navbar";
 import Cryptos from "./Cryptos";
 import Footer from "./Footer";
-import { useRisingCryptos } from "../utils/useRisingCryptos";
 
 const selectedCurrencies1 =
   "BTC,SHIB,CELO,CFX,BURGER,DNT,MASK,DATA,OG,CTXC,MBL,WAVES,MBL,ONG,AUDIO,HBAR,RLC,GTO,RAMP,SLP,DUSK,ONE,DOGE,TOMO,HARD,FORTH,CTSI,ICP,EPS,DCR,KEEP,PUNDIX,OM,COCOS,TRB,IRIS,AR,SUPER,DREP,WING,FIO,SOL,ANT,TWT,GTC,QTUM,CTK,WNXM,RVN,MTL,IOTX,SUSHI,ATOM,NKN,LINA,EGLD,STPT,ZEN,ZIL,ZRX,ZEC,YFI,XMR,XVS,XTZ";
@@ -29,6 +28,11 @@ function Main() {
   const [onlyDeals, setOnlyDeals] = useState<string[]>([]);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [priceIncreaseCount, setPriceIncreaseCount] = useState<{
+    [key: string]: number;
+  }>({});
+  const lastRatesRef = useRef<any>(null);
+
   const { data, error, isLoaded } = useApiRequest(
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies1}&tsyms=USD`,
     `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCurrencies2}&tsyms=USD`,
@@ -124,6 +128,45 @@ function Main() {
     }
   }, [showDeals, showFavorites, exchangeResults, alertAtMinimum]);
 
+  useEffect(() => {
+    if (data.length !== 0) {
+      const newRates = data;
+
+      if (lastRatesRef.current) {
+        const latest = newRates;
+        const previous = lastRatesRef.current;
+
+        const updatedCount: { [key: string]: number } = {
+          ...priceIncreaseCount,
+        };
+
+        for (const key in latest) {
+          if (previous[key] && latest[key].USD && previous[key].USD) {
+            const change =
+              (latest[key].USD - previous[key].USD) / previous[key].USD;
+            if (change >= 0.004) {
+              // 0.4%
+              updatedCount[key] = (updatedCount[key] || 0) + 1;
+            }
+          }
+        }
+
+        setPriceIncreaseCount(updatedCount);
+      }
+
+      lastRatesRef.current = newRates;
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPriceIncreaseCount({});
+      lastRatesRef.current = null;
+    }, 15 * 60 * 1000); // 15 minutes
+
+    return () => clearInterval(interval);
+  }, []);
+
   //Get favorites from localstorage
   useEffect(() => {
     const savedFavorites = localStorage.getItem("favorites");
@@ -167,8 +210,6 @@ function Main() {
     return currencies;
   };
 
-  const { cryptosWithRise, nextCheckIn } = useRisingCryptos(exchangeRates);
-
   if (error) return <div>Failed to load</div>;
   if (!isLoaded) return <div className="loading">Loading</div>;
   return (
@@ -190,28 +231,26 @@ function Main() {
           showFavorites,
         }}
       />
-      <div>
-        {nextCheckIn !== null && (
-          <p>
-            ⏱️ Next check in: {Math.floor(nextCheckIn / 60)}m {nextCheckIn % 60}
-            s
-          </p>
-        )}
-        <h3>🚀 Cryptos up ≥0.4% in 30 mins:</h3>
-        <ul
-          style={{
-            display: "flex",
-            listStyle: "none",
-            padding: 0,
-            gap: "15px",
-            flexWrap: "wrap",
-          }}
-        >
-          {cryptosWithRise.map((crypto) => (
-            <li key={crypto}>{crypto}</li>
-          ))}
-        </ul>
-      </div>
+      {Object.entries(priceIncreaseCount).length > 0 && (
+        <div>
+          <h2>Crypto 🚀 Count (≥ 0.4% increase)</h2>
+          <ul
+            style={{
+              display: "flex",
+              gap: "20px",
+              flexWrap: "wrap",
+              listStyle: "none",
+              padding: 0,
+            }}
+          >
+            {Object.entries(priceIncreaseCount).map(([symbol, count]) => (
+              <li key={symbol}>
+                {symbol}: <span className="font-semibold">{count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Cryptos
         {...{
           currencies,
