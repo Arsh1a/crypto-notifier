@@ -1,5 +1,6 @@
 import React from "react";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
+import { useViewTransition } from "../utils/useViewTransition";
 
 interface Props {
   currencies: string[];
@@ -24,6 +25,8 @@ function Cryptos({
   setFavorites,
   favorites,
 }: Props) {
+  const startTransition = useViewTransition();
+
   const handleFavorites = (currency: string) => {
     if (favorites.includes(currency)) {
       removeFromFavorites(currency);
@@ -61,12 +64,20 @@ function Cryptos({
     <>
       {exchangeRates.length !== calculateAfter && (
         <div className="loading loading-results">
-          It takes {Math.ceil((20 * calculateAfter) / 60)} minutes to calculate results
+          It takes {Math.ceil((20 * calculateAfter) / 60)} minutes to calculate
+          results
         </div>
       )}
       <div className="crypto-container">
         {data.map((currency: any, index) => (
-          <div className="crypto" style={{ background: calculateCardColor(currency) }} key={index}>
+          <div
+            className="crypto"
+            key={index}
+            style={{
+              background: calculateCardColor(currency),
+              viewTransitionName: `crypto-${currency}`,
+            }}
+          >
             <h1>{currency}</h1>
             <div className="rates">
               {exchangeRates ? exchangeRates[0][currency].USD : "TEST"}$
@@ -74,15 +85,7 @@ function Cryptos({
                 <>→{exchangeRates[exchangeRates.length - 1][currency].USD}$</>
               )}
             </div>
-            {
-              <p
-              // className={
-              //   Number(exchangeResults[0][currency]) >= alertAtMinimum ? "going-up" : "going-down"
-              // }
-              >
-                result :{calculateResult(currency)}
-              </p>
-            }
+            <p>result :{calculateResult(currency)}</p>
             <div className="crypto-exchange">
               <a
                 href={`https://www.binance.com/en/trade/${currency}_USDT`}
@@ -102,7 +105,11 @@ function Cryptos({
                 title="Favorite"
                 onClick={() => handleFavorites(currency)}
               >
-                {favorites.includes(currency) ? <IoMdHeart /> : <IoMdHeartEmpty />}
+                {favorites.includes(currency) ? (
+                  <IoMdHeart />
+                ) : (
+                  <IoMdHeartEmpty />
+                )}
               </span>
             </div>
           </div>

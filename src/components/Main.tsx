@@ -86,8 +86,8 @@ function Main() {
             playSound(audioRef);
           }
         }
-        //Plays sound if showFavorite not active and all currencies goes beyond alertAtMinimum
       } else {
+        //Plays sound if showFavorite not active and any currency goes beyond alertAtMinimum
         if (
           Object.values(exchangeResults[0]).some(
             (el: any) => el >= alertAtMinimum
