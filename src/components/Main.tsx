@@ -228,16 +228,39 @@ function Main() {
         {Object.keys(counts).length === 0 && <p>No counts yet.</p>}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           {Object.entries(counts)
-            .filter(([currency, count]) =>
+            .filter(([currency]) =>
               showFavorites ? favorites.includes(currency) : true
             )
-            .map(([currency, count]) => (
-              <div key={currency}>
-                <strong>{currency}:</strong> {count}
-              </div>
-            ))}
+            .map(([currency, count]) => {
+              const result = calculateResult(currency);
+              const isHigh = result && result >= 1.004;
+
+              return (
+                <div
+                  key={currency}
+                  style={{
+                    transition: "all 0.3s ease",
+                    border: isHigh
+                      ? "1px solid #b71919"
+                      : "1px solid rgb(133, 133, 133)",
+                    padding: "4px 6px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: isHigh ? "#b71919" : undefined,
+                    }}
+                  >
+                    {currency}:
+                  </span>{" "}
+                  {count}
+                </div>
+              );
+            })}
         </div>
       </div>
+
       <Cryptos
         {...{
           currencies,
