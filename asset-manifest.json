@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/crypto-notifier/static/css/main.ab30d55f.css",
-    "main.js": "/crypto-notifier/static/js/main.a7d14469.js",
+    "main.js": "/crypto-notifier/static/js/main.a1373e2a.js",
     "static/js/453.b31bae6d.chunk.js": "/crypto-notifier/static/js/453.b31bae6d.chunk.js",
     "service-worker.js": "/crypto-notifier/service-worker.js",
     "static/media/notification.mp3": "/crypto-notifier/static/media/notification.aec035724d8e0371491d.mp3",
     "index.html": "/crypto-notifier/index.html",
     "main.ab30d55f.css.map": "/crypto-notifier/static/css/main.ab30d55f.css.map",
-    "main.a7d14469.js.map": "/crypto-notifier/static/js/main.a7d14469.js.map",
+    "main.a1373e2a.js.map": "/crypto-notifier/static/js/main.a1373e2a.js.map",
     "453.b31bae6d.chunk.js.map": "/crypto-notifier/static/js/453.b31bae6d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ab30d55f.css",
-    "static/js/main.a7d14469.js"
+    "static/js/main.a1373e2a.js"
   ]
 }
