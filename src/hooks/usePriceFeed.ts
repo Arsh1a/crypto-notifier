@@ -31,6 +31,7 @@ export function usePriceFeed(settings: Settings, favorites: Set<string>) {
   live.current = { settings, favorites };
 
   const wantBaseline = useRef(true);
+  const baselineTries = useRef(0);
 
   const { pollSeconds, windowSize, resetMinutes, minVolume } = settings;
   const lookback = (windowSize - 1) * pollSeconds;
@@ -38,7 +39,8 @@ export function usePriceFeed(settings: Settings, favorites: Set<string>) {
   const fetchPrices = useCallback(async (signal?: AbortSignal) => {
     const s = live.current.settings;
     const params = new URLSearchParams({ minVolume: String(s.minVolume) });
-    if (wantBaseline.current) {
+    const asked = wantBaseline.current;
+    if (asked) {
       // Binance only serves whole-minute windows, so this is the nearest one.
       const minutes = Math.min(59, Math.max(1, Math.round(((s.windowSize - 1) * s.pollSeconds) / 60)));
       params.set("baseline", `${minutes}m`);
@@ -57,9 +59,15 @@ export function usePriceFeed(settings: Settings, favorites: Set<string>) {
 
       if (payload.opens) {
         wantBaseline.current = false;
+        baselineTries.current = 0;
         setBaseline(payload.opens);
         // Let this tick be scored again now that there is something to compare to.
         processedTs.current = 0;
+      } else if (asked) {
+        // The feed is on a fallback exchange that cannot serve one. Stop paying
+        // for the extra subrequests and let the app collect its own window.
+        baselineTries.current += 1;
+        if (baselineTries.current >= 2) wantBaseline.current = false;
       }
       setError(null);
       setStatus("live");
@@ -93,6 +101,7 @@ export function usePriceFeed(settings: Settings, favorites: Set<string>) {
 
   useEffect(() => {
     wantBaseline.current = true;
+    baselineTries.current = 0;
   }, [lookback, minVolume]);
 
   // Drop the oldest samples immediately when the window is shortened.

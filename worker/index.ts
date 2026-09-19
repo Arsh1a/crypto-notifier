@@ -30,7 +30,9 @@ interface FeedPayload {
 
 interface Source {
   id: string;
-  url: string;
+  /** Tried in order; the first host that answers wins. */
+  hosts: string[];
+  path: string;
   parse: (body: any, collect: Collect) => void;
 }
 
@@ -55,6 +57,29 @@ const SKIP_BASES = new Set([
 const SKIP_SUFFIX = /\d[LS]$/;
 /** Below this much 24h turnover a "pump" is one order, not a move. */
 const DEFAULT_MIN_VOLUME = 250_000;
+/**
+ * api.binance.com answers 403 to Cloudflare's edge — it blocks datacenter IPs —
+ * so the public market-data mirror goes first and the main host is the fallback
+ * for when this runs somewhere with a residential-looking address.
+ */
+const BINANCE_HOSTS = ["https://data-api.binance.vision", "https://api.binance.com"];
+
+/** GETs a Binance path, trying each host until one answers. */
+async function binanceFetch(path: string): Promise<unknown | null> {
+  for (const host of BINANCE_HOSTS) {
+    try {
+      const res = await fetch(`${host}${path}`, {
+        headers: { accept: "application/json", "user-agent": "crypto-notifier" },
+        signal: AbortSignal.timeout(9000),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // Try the next host.
+    }
+  }
+  return null;
+}
+
 /** Klines are one request per symbol, and a Worker gets 50 subrequests free. */
 const MAX_HISTORY_SYMBOLS = 40;
 const HISTORY_INTERVALS = new Set(["1m", "3m", "5m", "15m", "30m", "1h", "4h", "1d"]);
@@ -83,7 +108,8 @@ function collector(out: Map<string, Ticker & { rank: number }>): Collect {
 const SOURCES: Source[] = [
   {
     id: "binance",
-    url: "https://api.binance.com/api/v3/ticker/24hr",
+    hosts: BINANCE_HOSTS,
+    path: "/api/v3/ticker/24hr",
     parse: (body, add) => {
       for (const t of body as Array<Record<string, string>>) {
         add(t.symbol, Number(t.lastPrice), Number(t.quoteVolume));
@@ -92,7 +118,8 @@ const SOURCES: Source[] = [
   },
   {
     id: "bybit",
-    url: "https://api.bybit.com/v5/market/tickers?category=spot",
+    hosts: ["https://api.bybit.com"],
+    path: "/v5/market/tickers?category=spot",
     parse: (body, add) => {
       for (const t of body?.result?.list ?? []) {
         add(t.symbol, Number(t.lastPrice), Number(t.turnover24h));
@@ -100,8 +127,20 @@ const SOURCES: Source[] = [
     },
   },
   {
+    id: "mexc",
+    hosts: ["https://api.mexc.com"],
+    path: "/api/v3/ticker/24hr",
+    // MEXC implements Binance's schema, so the same reader works.
+    parse: (body, add) => {
+      for (const t of body as Array<Record<string, string>>) {
+        add(t.symbol, Number(t.lastPrice), Number(t.quoteVolume));
+      }
+    },
+  },
+  {
     id: "okx",
-    url: "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
+    hosts: ["https://www.okx.com"],
+    path: "/api/v5/market/tickers?instType=SPOT",
     parse: (body, add) => {
       for (const t of body?.data ?? []) {
         add(String(t.instId).replace(/-/g, ""), Number(t.last), Number(t.volCcy24h));
@@ -132,16 +171,10 @@ async function loadBaseline(
   const results = await Promise.all(
     chunks.map(async (chunk) => {
       const symbols = JSON.stringify(chunk.map(([, pair]) => pair));
-      const url =
-        `https://api.binance.com/api/v3/ticker?symbols=${encodeURIComponent(symbols)}` +
-        `&windowSize=${encodeURIComponent(windowSize)}`;
-      const res = await fetch(url, {
-        headers: { accept: "application/json", "user-agent": "crypto-notifier" },
-        signal: AbortSignal.timeout(9000),
-      });
-      if (!res.ok) return [] as Array<[string, number]>;
-
-      const body = (await res.json()) as Array<{ symbol: string; openPrice: string }>;
+      const body = (await binanceFetch(
+        `/api/v3/ticker?symbols=${encodeURIComponent(symbols)}` +
+          `&windowSize=${encodeURIComponent(windowSize)}`,
+      )) as Array<{ symbol: string; openPrice: string }> | null;
       if (!Array.isArray(body)) return [] as Array<[string, number]>;
 
       const byPair = new Map(chunk.map(([base, pair]) => [pair, base]));
@@ -158,76 +191,165 @@ async function loadBaseline(
   return Object.fromEntries(results.flat());
 }
 
-/** Closing prices for one pair, oldest first. Resolves empty if the pair is unknown. */
-async function loadSeries(pair: string, interval: string, limit: number): Promise<number[]> {
-  const url =
-    `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(pair)}` +
-    `&interval=${encodeURIComponent(interval)}&limit=${limit}`;
-  const res = await fetch(url, {
-    headers: { accept: "application/json", "user-agent": "crypto-notifier" },
-    signal: AbortSignal.timeout(9000),
-  });
-  if (!res.ok) return [];
+/**
+ * Closing prices for one pair, oldest first.
+ *
+ * Every exchange serves candles for one symbol at a time, so this runs once per
+ * card on screen. Binance is tried first and the others cover the case where it
+ * is blocked from wherever this Worker is running.
+ */
+const KLINE_INTERVALS: Record<string, { bybit: string; okx: string }> = {
+  "1m": { bybit: "1", okx: "1m" },
+  "3m": { bybit: "3", okx: "3m" },
+  "5m": { bybit: "5", okx: "5m" },
+  "15m": { bybit: "15", okx: "15m" },
+  "30m": { bybit: "30", okx: "30m" },
+  "1h": { bybit: "60", okx: "1H" },
+  "4h": { bybit: "240", okx: "4H" },
+  "1d": { bybit: "D", okx: "1D" },
+};
 
-  const body = (await res.json()) as unknown;
-  if (!Array.isArray(body)) return [];
-  // A kline is [openTime, open, high, low, close, ...]; index 4 is the close.
-  return body.map((row: any) => Number(row[4])).filter((n) => Number.isFinite(n) && n > 0);
+/** BTCUSDT -> BTC-USDT, which is how OKX names an instrument. */
+function toInstId(pair: string): string {
+  const quote = QUOTES.find((q) => pair.endsWith(q) && pair.length > q.length);
+  return quote ? `${pair.slice(0, pair.length - quote.length)}-${quote}` : pair;
 }
 
+async function getJson(url: string): Promise<any | null> {
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/json", "user-agent": "crypto-notifier" },
+      signal: AbortSignal.timeout(9000),
+    });
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Pulls the close out of each row and drops anything unusable. */
+function closes(rows: unknown, index: number, newestFirst: boolean): number[] {
+  if (!Array.isArray(rows)) return [];
+  const out = rows
+    .map((row: any) => Number(row?.[index]))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  return newestFirst ? out.reverse() : out;
+}
+
+async function loadSeries(pair: string, interval: string, limit: number): Promise<number[]> {
+  const alt = KLINE_INTERVALS[interval];
+
+  const binance = await binanceFetch(
+    `/api/v3/klines?symbol=${encodeURIComponent(pair)}` +
+      `&interval=${encodeURIComponent(interval)}&limit=${limit}`,
+  );
+  // A kline is [openTime, open, high, low, close, ...]; index 4 is the close.
+  const fromBinance = closes(binance, 4, false);
+  if (fromBinance.length > 1) return fromBinance;
+  if (!alt) return [];
+
+  const bybit = await getJson(
+    `https://api.bybit.com/v5/market/kline?category=spot&symbol=${encodeURIComponent(pair)}` +
+      `&interval=${alt.bybit}&limit=${limit}`,
+  );
+  // Bybit rows are [start, open, high, low, close, ...], newest first.
+  const fromBybit = closes(bybit?.result?.list, 4, true);
+  if (fromBybit.length > 1) return fromBybit;
+
+  const okx = await getJson(
+    `https://www.okx.com/api/v5/market/candles?instId=${encodeURIComponent(toInstId(pair))}` +
+      `&bar=${alt.okx}&limit=${limit}`,
+  );
+  // OKX rows are [ts, o, h, l, c, ...], newest first.
+  return closes(okx?.data, 4, true);
+}
+
+/**
+ * Enough coins that topping up from a second exchange is not worth the parse.
+ * Binance alone clears this; Bybit on its own does not.
+ */
+const TARGET_COINS = 350;
+
+/**
+ * Prices for every liquid pair.
+ *
+ * Sources are tried in order and the first that answers sets the baseline set of
+ * coins. Binance is blocked from Cloudflare's edge (403 on every host), so in
+ * production this usually lands on Bybit, which lists far fewer pairs — when the
+ * winner comes back thin the next exchange is merged in to top it up. Priority is
+ * fixed, so a given coin keeps quoting from the same book tick to tick rather
+ * than flipping between exchanges and inventing a move out of the spread.
+ */
 async function loadPrices(
   minVolume: number,
   only?: string | null,
 ): Promise<{ payload: FeedPayload; pairs: Map<string, string> }> {
   const errors: string[] = [];
-  // `?source=bybit` pins one exchange, which is how you check a fallback still parses.
   const chain = only ? SOURCES.filter((s) => s.id === only) : SOURCES;
 
+  const merged = new Map<string, Ticker & { rank: number }>();
+  const contributors: string[] = [];
+
   for (const source of chain) {
+    if (merged.size >= TARGET_COINS) break;
+
     try {
-      const res = await fetch(source.url, {
-        headers: { accept: "application/json", "user-agent": "crypto-notifier" },
-        signal: AbortSignal.timeout(9000),
-      });
-      if (!res.ok) {
-        errors.push(`${source.id}:${res.status}`);
-        continue;
+      let body: unknown = null;
+      for (const host of source.hosts) {
+        const res = await fetch(`${host}${source.path}`, {
+          headers: { accept: "application/json", "user-agent": "crypto-notifier" },
+          signal: AbortSignal.timeout(9000),
+        });
+        if (res.ok) {
+          body = await res.json();
+          break;
+        }
+        errors.push(`${new URL(host).hostname}:${res.status}`);
       }
+      if (body === null) continue;
 
       const tickers = new Map<string, Ticker & { rank: number }>();
-      source.parse(await res.json(), collector(tickers));
+      source.parse(body, collector(tickers));
 
-      const prices: Record<string, number> = {};
-      const volumes: Record<string, number> = {};
-      const pairs = new Map<string, string>();
-      for (const [base, t] of tickers) {
-        if (t.volume < minVolume) continue;
-        prices[base] = t.price;
-        volumes[base] = Math.round(t.volume);
-        pairs.set(base, t.pair);
+      let added = 0;
+      for (const [base, ticker] of tickers) {
+        if (ticker.volume < minVolume || merged.has(base)) continue;
+        merged.set(base, ticker);
+        added += 1;
       }
-
-      const oddPairs: Record<string, string> = {};
-      for (const [base, pair] of pairs) {
-        if (pair !== `${base}USDT`) oddPairs[base] = pair;
-      }
-
-      const count = Object.keys(prices).length;
-      // A handful of symbols means a degraded or partial response; try the next source.
-      if (count < 50) {
-        errors.push(`${source.id}:thin(${count})`);
-        continue;
-      }
-      return {
-        payload: { source: source.id, ts: Date.now(), count, prices, volumes, pairs: oddPairs },
-        pairs,
-      };
+      if (added) contributors.push(source.id);
     } catch (err) {
       errors.push(`${source.id}:${err instanceof Error ? err.name : "error"}`);
     }
   }
 
-  throw new Error(`all sources failed (${errors.join(", ")})`);
+  if (merged.size < 50) {
+    throw new Error(`all sources failed (${errors.join(", ") || "no data"})`);
+  }
+
+  const prices: Record<string, number> = {};
+  const volumes: Record<string, number> = {};
+  const pairs = new Map<string, string>();
+  const oddPairs: Record<string, string> = {};
+
+  for (const [base, ticker] of merged) {
+    prices[base] = ticker.price;
+    volumes[base] = Math.round(ticker.volume);
+    pairs.set(base, ticker.pair);
+    if (ticker.pair !== `${base}USDT`) oddPairs[base] = ticker.pair;
+  }
+
+  return {
+    payload: {
+      source: contributors.join("+"),
+      ts: Date.now(),
+      count: merged.size,
+      prices,
+      volumes,
+      pairs: oddPairs,
+    },
+    pairs,
+  };
 }
 
 /** Binance accepts 1m-59m, 1h-23h, 1d-7d. Anything else is rejected outright. */
@@ -253,7 +375,7 @@ export default {
         const { payload, pairs } = await loadPrices(minVolume, url.searchParams.get("source"));
 
         // Only the client's first poll asks for this; it costs six extra subrequests.
-        if (baselineWindow && payload.source === "binance") {
+        if (baselineWindow && payload.source.startsWith("binance")) {
           const opens = await loadBaseline(pairs, baselineWindow);
           // A pair with no trades in the window reports an open of 0. It did not
           // move, so its own current price is the honest baseline.

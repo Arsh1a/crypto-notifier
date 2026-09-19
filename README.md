@@ -14,15 +14,36 @@ card lights up and an alarm fires.
 ## Price feed
 
 The old CryptoCompare endpoint is no longer free. `/api/prices` is a Worker route
-that walks a chain of keyless public exchange tickers and returns the first that
-answers:
+that walks a chain of keyless public exchange tickers:
 
 1. Binance — `/api/v3/ticker/24hr`
 2. Bybit — `/v5/market/tickers?category=spot`
-3. OKX — `/api/v5/market/tickers?instType=SPOT`
+3. MEXC — `/api/v3/ticker/24hr` (same schema as Binance)
+4. OKX — `/api/v5/market/tickers?instType=SPOT`
 
-Running it through the Worker also removes CORS and per-region exchange blocks,
-since the request leaves from Cloudflare's edge rather than the browser.
+The first source that answers sets the coin list. If it comes back thin the next
+exchange is merged in to top it up, stopping once there are enough coins.
+Priority is fixed, so a coin keeps quoting from the same book tick to tick rather
+than flipping between exchanges and inventing a move out of the spread.
+
+### Binance is blocked from Cloudflare
+
+**Binance answers 403 to Cloudflare Workers** — it blocks datacenter egress, on
+`api.binance.com` and the `data-api.binance.vision` mirror alike. Locally it
+works fine, so this only shows up once deployed.
+
+Consequences in production:
+
+- The feed lands on `bybit+mexc+okx` (~340 coins) rather than Binance (~520).
+- The cold-start baseline is unavailable, because the rolling-window ticker is a
+  Binance-only endpoint. The app falls back to collecting its own window and
+  shows the warmup banner. The client stops asking after two attempts so it is
+  not paying for the extra subrequests every poll.
+- Charts still work: `/api/history` falls through Binance klines to Bybit's
+  `/v5/market/kline` and then OKX's `/api/v5/market/candles`.
+
+If you later front this with an egress that Binance accepts, everything above
+switches back on by itself — no code change.
 
 Pairs are normalised to a base symbol (USDT preferred, then USDC / FDUSD / TUSD),
 stablecoins and leveraged tokens are dropped, and anything turning over less than
