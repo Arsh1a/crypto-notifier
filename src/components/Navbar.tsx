@@ -1,77 +1,150 @@
-import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
-import { playSound } from "../utils";
-import { useViewTransition } from "../utils/useViewTransition";
+import { useEffect, useState, type FormEvent } from "react";
+import { MdVolumeOff, MdVolumeUp } from "react-icons/md";
+import { IoMdNotifications, IoMdNotificationsOff, IoMdSettings } from "react-icons/io";
 
 interface Props {
-  setSoundActive: Function;
-  soundActive: boolean;
-  audioRef: React.MutableRefObject<HTMLAudioElement>;
-  handleSubmit: React.FormEventHandler<HTMLFormElement>;
-  tempAlertAtMinimum: number;
-  setTempAlertAtMinimum: Function;
-  showDeals: boolean;
-  setShowDeals: Function;
-  showFavorites: boolean;
-  setShowFavorites: Function;
+  sound: boolean;
+  notifications: boolean;
+  onlyMovers: boolean;
+  onlyFavorites: boolean;
+  alertPercent: number;
+  query: string;
+  settingsOpen: boolean;
+  onToggleSound: () => void;
+  onToggleNotifications: () => void;
+  onToggleMovers: () => void;
+  onToggleFavorites: () => void;
+  onAlertPercent: (value: number) => void;
+  onQuery: (value: string) => void;
+  onToggleSettings: () => void;
 }
 
-function Navbar({
-  setSoundActive,
-  soundActive,
-  audioRef,
-  handleSubmit,
-  tempAlertAtMinimum,
-  setTempAlertAtMinimum,
-  setShowDeals,
-  showDeals,
-  setShowFavorites,
-  showFavorites,
+const PILL =
+  "cursor-pointer rounded-[20px] px-4 py-3 text-sm font-medium transition-opacity hover:opacity-50";
+
+function GlyphButton({
+  active,
+  label,
+  onClick,
+  children,
+}: {
+  active?: boolean;
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      aria-pressed={active}
+      className={`cursor-pointer text-[30px] leading-none transition-opacity hover:opacity-50 ${
+        active ? "text-brand" : "text-paper/70"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function Navbar({
+  sound,
+  notifications,
+  onlyMovers,
+  onlyFavorites,
+  alertPercent,
+  query,
+  settingsOpen,
+  onToggleSound,
+  onToggleNotifications,
+  onToggleMovers,
+  onToggleFavorites,
+  onAlertPercent,
+  onQuery,
+  onToggleSettings,
 }: Props) {
-  const startTransition = useViewTransition();
+  const [draft, setDraft] = useState(String(alertPercent));
 
-  const handleToggleFavorites = () => {
-    startTransition(() => setShowFavorites((prev: boolean) => !prev));
-  };
+  // Keep the field honest if the value changes from the settings panel.
+  useEffect(() => setDraft(String(alertPercent)), [alertPercent]);
 
-  const handleToggleDeals = () => {
-    startTransition(() => setShowDeals((prev: boolean) => !prev));
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const next = Number(draft);
+    if (Number.isFinite(next) && next > 0) onAlertPercent(next);
+    else setDraft(String(alertPercent));
   };
 
   return (
-    <div className="navbar">
-      <div className="left-navbar">
-        <div
-          className="sound"
-          onClick={() => {
-            setSoundActive(!soundActive);
-            !soundActive && playSound(audioRef);
-          }}
+    <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+        <GlyphButton active={sound} label={sound ? "Mute alerts" : "Enable alert sound"} onClick={onToggleSound}>
+          {sound ? <MdVolumeUp /> : <MdVolumeOff />}
+        </GlyphButton>
+        <GlyphButton
+          active={notifications}
+          label={notifications ? "Disable desktop notifications" : "Enable desktop notifications"}
+          onClick={onToggleNotifications}
         >
-          {soundActive ? <MdVolumeUp /> : <MdVolumeOff />}
-        </div>
-        <button onClick={handleToggleDeals}>
-          {showDeals ? <>Show all</> : <>Show only greens</>}
+          {notifications ? <IoMdNotifications /> : <IoMdNotificationsOff />}
+        </GlyphButton>
+
+        <button
+          type="button"
+          onClick={onToggleMovers}
+          aria-pressed={onlyMovers}
+          className={`${PILL} ${onlyMovers ? "bg-paper text-bg" : "bg-brand text-bg"}`}
+        >
+          {onlyMovers ? "Show all" : "Show only greens"}
         </button>
-        <button onClick={handleToggleFavorites}>
-          {showFavorites ? <>Show all</> : <>Show only favorites</>}
+        <button
+          type="button"
+          onClick={onToggleFavorites}
+          aria-pressed={onlyFavorites}
+          className={`${PILL} ${onlyFavorites ? "bg-paper text-bg" : "bg-brand text-bg"}`}
+        >
+          {onlyFavorites ? "Show all" : "Show only favorites"}
         </button>
       </div>
-      <div className="right-navbar">
-        <div className="alert-at">
-          Alert at:
-          <form onSubmit={handleSubmit}>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <input
+          value={query}
+          onChange={(e) => onQuery(e.target.value)}
+          placeholder="Search"
+          spellCheck={false}
+          autoComplete="off"
+          aria-label="Search symbols"
+          className="card-sheen w-36 rounded-[15px] px-4 py-3 text-sm outline-none placeholder:text-paper/35 focus:ring-1 focus:ring-brand/60"
+        />
+
+        <div className="flex items-center gap-3 text-sm">
+          <span className="whitespace-nowrap">Alert at %:</span>
+          <form onSubmit={submit} className="relative flex items-center">
             <input
               required
               type="number"
-              value={tempAlertAtMinimum}
-              onChange={(e) => setTempAlertAtMinimum(e.target.value)}
+              step="0.1"
+              min="0.1"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              aria-label="Alert threshold in percent"
+              className="card-sheen tnum w-32 rounded-[15px] py-3 pr-16 pl-4 text-sm outline-none focus:ring-1 focus:ring-brand/60"
             />
-            <input type="submit" value="Apply" />
+            <input
+              type="submit"
+              value="Apply"
+              className="absolute right-3 cursor-pointer bg-transparent text-sm text-brand transition-opacity hover:opacity-50"
+            />
           </form>
         </div>
+
+        <GlyphButton active={settingsOpen} label="Settings" onClick={onToggleSettings}>
+          <IoMdSettings />
+        </GlyphButton>
       </div>
     </div>
   );
 }
-
-export default Navbar;
